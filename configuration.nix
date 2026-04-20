@@ -16,7 +16,7 @@
   boot.loader.grub.useOSProber = true;
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant. conflict with networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -105,12 +105,21 @@
     pkgs.kdePackages.kate
     pkgs.kitty
     pkgs.git
+    pkgs.micro
+    
+    # Programmation Languages
+    python3
 
+    # Some dependencies
+    nbfc-linux
+    wl-clipboard
+    libnotify
 
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
+  # web diagnostic & cybersecurity tools
   # programs.mtr.enable = true;
   # programs.gnupg.agent = {
   #   enable = true;
@@ -122,8 +131,10 @@
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
+
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  # Autorize the default minecraft ports 25565
+  networking.firewall.allowedTCPPorts = [ 25565 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
