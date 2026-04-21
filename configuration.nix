@@ -81,7 +81,7 @@ let
 	      nbfc set -s $new_speed
 	      echo "$new_speed" > "$STATE_FILE"
 	      
-	  elif [ "$action" == "moins" ]
+	  elif [ "$action" == "minus" ]
 	  then
       	new_speed=$((current_speed - step))
       	if [ $new_speed -lt 0 ]; then new_speed=0; fi
@@ -265,9 +265,9 @@ in
     # Programmation Languages
     python3
 
-	# Scripts
-	fanScript
-	pickerScript
+    # Scripts
+    fanScript
+    pickerScript
 
     # Some dependencies
     nbfc-linux
@@ -276,6 +276,85 @@ in
 
   ];
 
+  
+  # Enable dconf to allow custom GNOME settings
+  #programs.dconf.enable = true;
+
+  # Systemd service to automate GNOME shortcut injection at login
+  systemd.user.services.init-gnome-shortcuts = {
+    description = "Initialize GNOME custom shortcuts";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.writeShellScript "init-shortcuts" ''
+        DCONF="${pkgs.dconf}/bin/dconf"
+
+        # List of all custom shortcut paths to be registered
+        SETTINGS_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+        BINDINGS="['$SETTINGS_PATH/custom-term/', '$SETTINGS_PATH/browser-launch/', '$SETTINGS_PATH/file-manager-launch/', '$SETTINGS_PATH/custom-picker/', '$SETTINGS_PATH/custom-fan-minus-2/', '$SETTINGS_PATH/custom-fan-plus-2/', '$SETTINGS_PATH/custom-fan-minus-10/', '$SETTINGS_PATH/custom-fan-plus-10/', '$SETTINGS_PATH/custom-fan-set-50/', '$SETTINGS_PATH/custom-fan-set-80/', '$SETTINGS_PATH/custom-fan-set-100/']"
+
+        # Register the master list
+        $DCONF write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings "$BINDINGS"
+
+        # 1. Kitty Terminal: Super + C
+        $DCONF write $SETTINGS_PATH/custom-term/name "'Open Terminal'"
+        $DCONF write $SETTINGS_PATH/custom-term/command "'kitty'"
+        $DCONF write $SETTINGS_PATH/custom-term/binding "'<Super>c'"
+
+        # 2. Browser: Super + F
+        $DCONF write $SETTINGS_PATH/browser-launch/name "'Open Browser'"
+        $DCONF write $SETTINGS_PATH/browser-launch/command "'firefox'"
+        $DCONF write $SETTINGS_PATH/browser-launch/binding "'<Super>f'"
+
+        # 3. File Manager: Super + E
+        $DCONF write $SETTINGS_PATH/file-manager-launch/name "'Open File Manager'"
+        $DCONF write $SETTINGS_PATH/file-manager-launch/command "'nautilus'"
+        $DCONF write $SETTINGS_PATH/file-manager-launch/binding "'<Super>e'"
+
+        # 4. Color Picker: Super + Ù
+        $DCONF write $SETTINGS_PATH/custom-picker/name "'Color Picker'"
+        $DCONF write $SETTINGS_PATH/custom-picker/command "'pick_color.sh'"
+        $DCONF write $SETTINGS_PATH/custom-picker/binding "'<Super>ugrave'"
+
+        # 5. Fan -2%: Super + F1
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/name "'Fan -2%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/command "'fan_control.sh minus 2'"
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/binding "'<Super>F1'"
+
+        # 6. Fan +2%: Super + F2
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/name "'Fan +2%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/command "'fan_control.sh plus 2'"
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/binding "'<Super>F2'"
+
+        # 7. Fan -10%: Super + F3
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/name "'Fan -10%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/command "'fan_control.sh minus 10'"
+        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/binding "'<Super>F3'"
+
+        # 8. Fan +10%: Super + F4
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/name "'Fan +10%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/command "'fan_control.sh plus 10'"
+        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/binding "'<Super>F4'"
+
+        # 9. Fan Set 50%: Super + F5
+        $DCONF write $SETTINGS_PATH/custom-fan-set-50/name "'Fan Set 50%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-50/command "'fan_control.sh set 50'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-50/binding "'<Super>F5'"
+
+        # 10. Fan Set 80%: Super + F6
+        $DCONF write $SETTINGS_PATH/custom-fan-set-80/name "'Fan Set 80%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-80/command "'fan_control.sh set 80'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-80/binding "'<Super>F6'"
+
+        # 11. Fan Set 100%: Super + F7
+        $DCONF write $SETTINGS_PATH/custom-fan-set-100/name "'Fan Set 100%'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-100/command "'fan_control.sh set 100'"
+        $DCONF write $SETTINGS_PATH/custom-fan-set-100/binding "'<Super>F7'"
+      ''}";
+    };
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # web diagnostic & cybersecurity tools
