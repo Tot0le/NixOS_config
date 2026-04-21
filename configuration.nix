@@ -2,6 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+# TODO : add shortcuts
+# TODO : Configurer kitty
+# TODO : quand maintiens VER MAJ + fleche gauche, droite, bas, haut, ça fait respectivement, debut de ligne, fin de ligne, page bas, page haut
+# TODO : rajout obsidian, vscodium, vscode, btop, pinta, oracle virtualbox pour windows, 
+# TODO : gérer les fichiers pour serveur minecraft
+# TODO : gérer les versions de java, pour coder + javafx, et très récent pour serveur minecraft
+# TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
+
 { config, pkgs, ... }:
 
 let 
