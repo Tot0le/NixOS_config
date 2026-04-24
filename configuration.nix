@@ -12,136 +12,14 @@
 
 { config, pkgs, ... }:
 
-let 
-  fanScript = pkgs.writeShellScriptBin "fan_control.sh" ''
-	  #!/bin/bash
-	  
-	  # --- CONFIGURATION ---
-	  declare action="$1"
-	  declare param="$2" # Peut être le "step" (pour + et -) ou la valeur cible (pour set)
-	  declare -i HARD_LIMIT=100
-	  declare STATE_FILE="/tmp/fan_speed_memory" 
-	  
-	  # Valeur par défaut du pas si non précisée (pour plus/moins)
-	  declare -i step=''${param:-2}
-	  
-	  # --- AUTO-RÉPARATION DU SERVICE ---
-	  if ! systemctl is-active --quiet nbfc_service
-	  then
-	      sudo systemctl restart nbfc_service
-	      sleep 2
-	  
-	  fi
-	  
-	  declare -i current_speed
-	  declare -i new_speed
-	  
-	  # --- LECTURE INTELLIGENTE ---
-	  if [ -f "$STATE_FILE" ]
-	  then
-	      current_speed=$(cat "$STATE_FILE")
-	  else
-	      # Si pas de fichier, on lit le BIOS.
-	      # Si le BIOS renvoie vide ou erreur, on considère 20.
-	      current_speed=$(nbfc status | grep -m1 "Target" | sed 's/.*Target: \([0-9]*\).*/\1/')
-	      if [ -z "$current_speed" ]; then current_speed=20; fi
-	  fi
-	  
-	  # --- LOGIQUE ---
-	  
-	  if [ "$action" == "auto" ]
-	  then
-	      nbfc set -a
-	      rm -f "$STATE_FILE"
-	  
-	  elif [ "$action" == "set" ]
-	  then
-	      # On récupère la valeur demandée (le 2ème argument)
-	      target=''${param:-100} # Si oublies du chiffre, ça met 100 par sécurité
-	  
-	      if [ $target -gt $HARD_LIMIT ]; then target=$HARD_LIMIT; fi
-	      if [ $target -lt 0 ]; then target=0; fi
-	  
-	      nbfc set -s $target
-	      echo "$target" > "$STATE_FILE"
-	  
-	  elif [ "$action" == "plus" ]
-	  then
-	      # CORRECTION DU BUG : 
-	      # Si on est en dessous de 30% (mode silencieux ou auto faible),
-	      # un appui sur "+" nous propulse direct à 30% pour que ça serve à quelque chose.
-	      if [ $current_speed -lt 30 ]; then
-	          new_speed=30
-	      else
-	          new_speed=$((current_speed + step))
-	      fi
-	  
-	      if [ $new_speed -gt $HARD_LIMIT ]; then new_speed=$HARD_LIMIT; fi
-	  
-	      nbfc set -s $new_speed
-	      echo "$new_speed" > "$STATE_FILE"
-	      
-	  elif [ "$action" == "minus" ]
-	  then
-      	new_speed=$((current_speed - step))
-      	if [ $new_speed -lt 0 ]; then new_speed=0; fi
-  
-        nbfc set -s $new_speed
-        echo "$new_speed" > "$STATE_FILE"
-        
-    fi
-    ''; # end FanScript
-
-  # Color picker
-  pickerScript = pkgs.writeShellScriptBin "pick_color.sh" ''
-	    #!/bin/bash
-	    
-	    # Déclaration de variables
-	    declare rawData
-	    declare hexColor
-	    
-	    # Appel du service de capture natif de GNOME
-	    rawData=$(gdbus call --session \
-	        --dest org.gnome.Shell.Screenshot \
-	        --object-path /org/gnome/Shell/Screenshot \
-	        --method org.gnome.Shell.Screenshot.PickColor)
-	    
-	    if [ -n "$rawData" ]
-	    then
-	        # On exporte dans l'environnement pour eviter le conflit de quotes dans le shell
-	        export RAW_DATA="$rawData"
-	    
-hexColor=$(python3 -c '
-import os
-import re
-
-def convertToHex() -> str:
-    rawInput: str = os.getenv("RAW_DATA", "")
-    resultHex: str = ""
-    match = re.search(r"\(([\d\.]+),\s*([\d\.]+),\s*([\d\.]+)\)", rawInput)
-    if match:
-        r: int = int(float(match.group(1)) * 255)
-        g: int = int(float(match.group(2)) * 255)
-        b: int = int(float(match.group(3)) * 255)
-        resultHex = "#{:02x}{:02x}{:02x}".format(r, g, b)
-    return resultHex
-
-print(convertToHex())
-')
-	    
-	        if [ -n "$hexColor" ]
-	        then
-	            echo -n "$hexColor" | wl-copy
-	            notify-send "Color Picker" "Copié : $hexColor" -i color-select
-	        fi
-	    fi''; # end pick color script
-
-in
-
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      # Include modules
+      ./modules/cooling.nix
+      ./modules/graphics.nix
+      ./modules/shortcuts.nix
     ];
 
   # Bootloader.
@@ -265,10 +143,6 @@ in
     # Programmation Languages
     python3
 
-    # Scripts
-    fanScript
-    pickerScript
-
     # Some dependencies
     nbfc-linux
     wl-clipboard
@@ -278,83 +152,8 @@ in
 
   
   # Enable dconf to allow custom GNOME settings
-  #programs.dconf.enable = true;
+  # programs.dconf.enable = true;
 
-  # Systemd service to automate GNOME shortcut injection at login
-  systemd.user.services.init-gnome-shortcuts = {
-    description = "Initialize GNOME custom shortcuts";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.writeShellScript "init-shortcuts" ''
-        DCONF="${pkgs.dconf}/bin/dconf"
-
-        # List of all custom shortcut paths to be registered
-        SETTINGS_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
-        BINDINGS="['$SETTINGS_PATH/custom-term/', '$SETTINGS_PATH/browser-launch/', '$SETTINGS_PATH/file-manager-launch/', '$SETTINGS_PATH/custom-picker/', '$SETTINGS_PATH/custom-fan-minus-2/', '$SETTINGS_PATH/custom-fan-plus-2/', '$SETTINGS_PATH/custom-fan-minus-10/', '$SETTINGS_PATH/custom-fan-plus-10/', '$SETTINGS_PATH/custom-fan-set-50/', '$SETTINGS_PATH/custom-fan-set-80/', '$SETTINGS_PATH/custom-fan-set-100/']"
-
-        # Register the master list
-        $DCONF write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings "$BINDINGS"
-
-        # 1. Kitty Terminal: Super + C
-        $DCONF write $SETTINGS_PATH/custom-term/name "'Open Terminal'"
-        $DCONF write $SETTINGS_PATH/custom-term/command "'kitty'"
-        $DCONF write $SETTINGS_PATH/custom-term/binding "'<Super>c'"
-
-        # 2. Browser: Super + F
-        $DCONF write $SETTINGS_PATH/browser-launch/name "'Open Browser'"
-        $DCONF write $SETTINGS_PATH/browser-launch/command "'firefox'"
-        $DCONF write $SETTINGS_PATH/browser-launch/binding "'<Super>f'"
-
-        # 3. File Manager: Super + E
-        $DCONF write $SETTINGS_PATH/file-manager-launch/name "'Open File Manager'"
-        $DCONF write $SETTINGS_PATH/file-manager-launch/command "'nautilus'"
-        $DCONF write $SETTINGS_PATH/file-manager-launch/binding "'<Super>e'"
-
-        # 4. Color Picker: Super + Ù
-        $DCONF write $SETTINGS_PATH/custom-picker/name "'Color Picker'"
-        $DCONF write $SETTINGS_PATH/custom-picker/command "'pick_color.sh'"
-        $DCONF write $SETTINGS_PATH/custom-picker/binding "'<Super>ugrave'"
-
-        # 5. Fan -2%: Super + F1
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/name "'Fan -2%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/command "'fan_control.sh minus 2'"
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-2/binding "'<Super>F1'"
-
-        # 6. Fan +2%: Super + F2
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/name "'Fan +2%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/command "'fan_control.sh plus 2'"
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-2/binding "'<Super>F2'"
-
-        # 7. Fan -10%: Super + F3
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/name "'Fan -10%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/command "'fan_control.sh minus 10'"
-        $DCONF write $SETTINGS_PATH/custom-fan-minus-10/binding "'<Super>F3'"
-
-        # 8. Fan +10%: Super + F4
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/name "'Fan +10%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/command "'fan_control.sh plus 10'"
-        $DCONF write $SETTINGS_PATH/custom-fan-plus-10/binding "'<Super>F4'"
-
-        # 9. Fan Set 50%: Super + F5
-        $DCONF write $SETTINGS_PATH/custom-fan-set-50/name "'Fan Set 50%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-50/command "'fan_control.sh set 50'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-50/binding "'<Super>F5'"
-
-        # 10. Fan Set 80%: Super + F6
-        $DCONF write $SETTINGS_PATH/custom-fan-set-80/name "'Fan Set 80%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-80/command "'fan_control.sh set 80'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-80/binding "'<Super>F6'"
-
-        # 11. Fan Set 100%: Super + F7
-        $DCONF write $SETTINGS_PATH/custom-fan-set-100/name "'Fan Set 100%'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-100/command "'fan_control.sh set 100'"
-        $DCONF write $SETTINGS_PATH/custom-fan-set-100/binding "'<Super>F7'"
-      ''}";
-    };
-  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # web diagnostic & cybersecurity tools
