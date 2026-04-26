@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
 {
+  # Install kitty terminal emulator
   environment.systemPackages = [
     pkgs.kitty
   ];

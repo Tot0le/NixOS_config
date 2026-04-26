@@ -9,6 +9,7 @@
 # TODO : gérer les fichiers pour serveur minecraft
 # TODO : gérer les versions de java, pour coder + javafx, et très récent pour serveur minecraft
 # TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
+# TODO : gérer droit utilisateur au niveau de la création, pas anatole
 
 { config, pkgs, ... }:
 
@@ -22,6 +23,8 @@
       ./modules/shortcuts.nix
       ./modules/monitoring.nix
       ./modules/kitty.nix
+      ./modules/git_tools.nix
+      ./modules/shell.nix
     ];
 
   # Bootloader.
@@ -116,7 +119,7 @@
     ];
   };
   
-  # Autoriser a relancer les ventilos sans password
+  # Allow the fans to restart without a password.
     security.sudo.extraRules = [{
       users = [ "anatole" ];
       commands = [{
@@ -151,6 +154,12 @@
 
   ];
 
+  # Force micro to use system clipboard (wl-clipboard)
+  environment.etc."micro/settings.json".text = ''
+    {
+        "clipboard": "external"
+    }
+  '';
   
   # Enable dconf to allow custom GNOME settings
   # programs.dconf.enable = true;
