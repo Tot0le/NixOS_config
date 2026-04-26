@@ -20,6 +20,7 @@
       ./modules/cooling.nix
       ./modules/graphics.nix
       ./modules/shortcuts.nix
+      ./modules/monitoring.nix
     ];
 
   # Bootloader.
