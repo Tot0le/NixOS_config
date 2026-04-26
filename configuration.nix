@@ -21,6 +21,7 @@
       ./modules/graphics.nix
       ./modules/shortcuts.nix
       ./modules/monitoring.nix
+      ./modules/kitty.nix
     ];
 
   # Bootloader.
@@ -137,7 +138,6 @@
   #  wget
     # Basic tools
     pkgs.kdePackages.kate
-    pkgs.kitty
     pkgs.git
     pkgs.micro
     
