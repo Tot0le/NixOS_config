@@ -2,8 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-# TODO : add shortcuts
-# TODO : Configurer kitty
+# TODO : eclipse : plantUML, sonarQube, JUnit
 # TODO : quand maintiens VER MAJ + fleche gauche, droite, bas, haut, ça fait respectivement, debut de ligne, fin de ligne, page bas, page haut
 # TODO : rajout obsidian, vscodium, vscode, btop, pinta, oracle virtualbox pour windows, 
 # TODO : gérer les fichiers pour serveur minecraft
@@ -25,6 +24,7 @@
       ./modules/kitty.nix
       ./modules/git_tools.nix
       ./modules/shell.nix
+      ./modules/docker.nix
     ];
 
   # Bootloader.
@@ -146,6 +146,9 @@
     
     # Programmation Languages
     python3
+
+    # Database
+    postgresql
 
     # Some dependencies
     nbfc-linux
