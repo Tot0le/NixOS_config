@@ -2,6 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+# TODO FIRST : un fichier config pour tout les shortcuts, et config l'utilisateur
 # TODO : eclipse : plantUML, sonarQube, JUnit
 # TODO : quand maintiens VER MAJ + fleche gauche, droite, bas, haut, ça fait respectivement, debut de ligne, fin de ligne, page bas, page haut
 # TODO : rajout obsidian, vscodium, vscode, btop, pinta, oracle virtualbox pour windows, 
@@ -140,7 +141,7 @@
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
     # Basic tools
-    pkgs.kdePackages.kate
+    gnome-text-editor
     pkgs.git
     pkgs.micro
     
