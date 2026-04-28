@@ -1,13 +1,15 @@
-{ pkgs, ... }:
+# /etc/nixos/modules/docker.nix
+{ pkgs, userList, ... }:
 
 {
-  # Enable Docker daemon
+  # Enable Docker virtualization
   virtualisation.docker.enable = true;
 
-  # Add user to docker group to avoid using sudo for docker commands
-  users.users.anatole.extraGroups = [ "docker" ];
+  # Grant docker permissions to all primary users
+  users.users = pkgs.lib.genAttrs userList (name: {
+    extraGroups = [ "docker" ];
+  });
 
-  # Install docker-compose helper
   environment.systemPackages = [
     pkgs.docker-compose
   ];

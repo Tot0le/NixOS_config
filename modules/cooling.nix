@@ -1,4 +1,5 @@
-{ pkgs, ... }:
+# /etc/nixos/modules/cooling.nix
+{ pkgs, userList, ... }:
 
 let
   # Script to control fan speed via NBFC
@@ -80,12 +81,20 @@ in
     pkgs.nbfc-linux
   ];
 
-  # Passwordless sudo rule for fan service restart
-  security.sudo.extraRules = [{
-    users = [ "anatole" ];
-    commands = [{
-      command = "/run/current-system/sw/bin/systemctl restart nbfc_service";
-      options = [ "NOPASSWD" ];
-    }];
-  }];
+  # Authorize each user in the list for specific fan commands
+  security.sudo.extraRules = builtins.map (user: {
+    users = [ user ];
+    commands = [
+      {
+        # Permission to restart the fan service
+        command = "/run/current-system/sw/bin/systemctl restart nbfc_service";
+        options = [ "NOPASSWD" ];
+      }
+      {
+        # Permission to use nbfc directly for speed changes
+        command = "${pkgs.nbfc-linux}/bin/nbfc";
+        options = [ "NOPASSWD" ];
+      }
+    ];
+  }) userList;
 }

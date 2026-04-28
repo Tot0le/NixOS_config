@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, userList, ... }:
 
 {
   # Zsh system-wide configuration
@@ -30,21 +30,23 @@
       
       # Initialize, edit, and launch a permanent database project in the current directory
       setup-db() {
-         if [ ! -f "shell.nix" ]
-         then
-           cp /etc/nixos/templates/postgres-kit.nix ./shell.nix
-         fi
-         
-         # Open the file for editing
-         nano shell.nix
-         
-         # Launch the environment once the editor is closed
-         nix-shell
-       }
+        if [ ! -f "shell.nix" ]
+        then
+          cp /etc/nixos/templates/postgres-kit.nix ./shell.nix
+        fi
+        
+        # Open the file for editing
+        nano shell.nix
+        
+        # Launch the environment once the editor is closed
+        nix-shell
+      }
       
     '';
   };
 
-  # Set Zsh as default shell for user 'anatole'
-  users.users.anatole.shell = pkgs.zsh;
+  # Set Zsh as the default shell for all primary users
+  users.users = pkgs.lib.genAttrs userList (name: {
+    shell = pkgs.zsh;
+  });
 }

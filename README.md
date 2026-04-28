@@ -60,13 +60,13 @@ cd /etc/nixos/
 ```
 
 ### 3. 👤 User Personalization
-Currently, the username `anatole` is hardcoded across several modules (User creation, Docker, Cooling, and Shell). 
+The users are now managed centrally in `configuration.nix`. To add or modify users, update the `usersConfigs` attribute set at the top of the file:
 
-> **Note:** A future update will centralize this into a single global variable. For now, to use your own identity, you must manually replace the string `anatole` in the following files:
-* `configuration.nix`
-* `modules/cooling.nix`
-* `modules/docker.nix`
-* `modules/shell.nix`
+```nix
+  usersConfigs = {
+    yourname = { fullName = "Your Name"; isAdmin = true; };
+  };
+```
 
 ### 4. 🔒 Secrets & Tokens
 Sensitive data is isolated in a separate file. Create it from the template:

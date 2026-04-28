@@ -11,9 +11,26 @@
 # TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
 # TODO : gérer droit utilisateur au niveau de la création, pas anatole
 
+# /etc/nixos/configuration.nix
 { config, pkgs, ... }:
 
+let
+  # Define all system users and their respective roles
+  # NOTE: After first rebuild, you must manually set passwords:
+  # sudo passwd <username>
+  usersConfigs = {
+    anatole = { fullName = "Anatole"; isAdmin = true; };
+    user   = { fullName = "Random User";   isAdmin = false; };
+  };
+  
+  # Extract names for module propagation
+  userList = builtins.attrNames usersConfigs;
+in
 {
+  # Propagate the list to all modules
+  _module.args = { inherit userList; };
+
+  
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
@@ -97,38 +114,19 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
-  
-  # NBFC activation (NoteBook Fan Control)
-  # systemd.services.nbfc_service = {
-  #   enable = true;
-  #   description = "NoteBook Fan Control service";
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     ExecStart = "${pkgs.nbfc-linux}/bin/nbfc_service --config-file '/nix/store/...ton_config.json'";
-  #     Restart = "always";
-  #   };
-  #   wantedBy = [ "multi-user.target" ];
-  # };
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.anatole = {
+  # Generate user accounts with conditional admin rights
+  users.users = pkgs.lib.mapAttrs (name: info: {
     isNormalUser = true;
-    description = "Anatole";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
-  };
-  
-  # Allow the fans to restart without a password.
-    security.sudo.extraRules = [{
-      users = [ "anatole" ];
-      commands = [{
-        command = "/run/current-system/sw/bin/systemctl restart nbfc_service";
-        options = [ "NOPASSWD" ];
-      }];
-    }];
+    description = info.fullName;
+    
+    # Base groups for everyone
+    # Add 'wheel' only if isAdmin is true
+    extraGroups = [ "networkmanager" ] 
+      ++ (if info.isAdmin then [ "wheel" ] else []);
+  }) usersConfigs;
 
+  
   # Install firefox.
   programs.firefox.enable = true;
 
