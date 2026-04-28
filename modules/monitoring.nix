@@ -7,7 +7,7 @@ let
     
     declare -i cpuTempRaw=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0)
     declare -i cpuTemp=$((cpuTempRaw / 1000))
-    declare stateFile="/tmp/fan_speed_memory"
+    declare stateFile="/tmp/fan_speed_memory_$(whoami)"
     declare output=""
 
     # Process CPU temperature

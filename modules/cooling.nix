@@ -2,18 +2,23 @@
 { pkgs, userList, ... }:
 
 let
+  # Define strict absolute paths to match sudo security rules
+  nbfcCmd = "${pkgs.nbfc-linux}/bin/nbfc";
+  systemctlCmd = "/run/current-system/sw/bin/systemctl";
+  
   # Script to control fan speed via NBFC
   fanScript = pkgs.writeShellScriptBin "fan_control.sh" ''
     #!/bin/bash
     declare action="$1"
     declare param="$2"
     declare -i HARD_LIMIT=100
-    declare STATE_FILE="/tmp/fan_speed_memory"
+    # One file per user
+    declare STATE_FILE="/tmp/fan_speed_memory_$(whoami)"
     declare -i step=''${param:-2}
 
     if ! systemctl is-active --quiet nbfc_service
     then
-        sudo systemctl restart nbfc_service
+        sudo ''${systemctlCmd} restart nbfc_service
         sleep 2
     fi
 
@@ -24,7 +29,7 @@ let
     then
         current_speed=$(cat "$STATE_FILE")
     else
-        current_speed=$(nbfc status | grep -m1 "Target" | sed 's/.*Target: \([0-9]*\).*/\1/')
+        current_speed=$(sudo ''${nbfcCmd} status | grep -m1 "Target" | sed 's/.*Target: \([0-9]*\).*/\1/')
         if [ -z "$current_speed" ]
         then 
             current_speed=20
@@ -33,7 +38,7 @@ let
 
     if [ "$action" == "auto" ]
     then
-        nbfc set -a
+        sudo ''${nbfcCmd} set -a
         rm -f "$STATE_FILE"
     elif [ "$action" == "set" ]
     then
@@ -46,7 +51,7 @@ let
         then 
             target=0
         fi
-        nbfc set -s $target
+        sudo ''${nbfcCmd} set -s $target
         echo "$target" > "$STATE_FILE"
     elif [ "$action" == "plus" ]
     then
@@ -60,7 +65,7 @@ let
         then 
             new_speed=$HARD_LIMIT
         fi
-        nbfc set -s $new_speed
+        sudo ''${nbfcCmd} set -s $new_speed
         echo "$new_speed" > "$STATE_FILE"
     elif [ "$action" == "minus" ]
     then
@@ -69,7 +74,7 @@ let
         then 
             new_speed=0
         fi
-        nbfc set -s $new_speed
+        sudo ''${nbfcCmd} set -s $new_speed
         echo "$new_speed" > "$STATE_FILE"
     fi
   '';
