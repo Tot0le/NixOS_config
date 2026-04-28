@@ -17,4 +17,9 @@
     fanSet80    = [ "Fan 80%" "fan_control.sh set 80" "<Super>F6" ];
     fanSet100   = [ "Fan 100%" "fan_control.sh set 100" "<Super>F7" ];
   };
+
+  # System-wide overrides for existing GNOME shortcuts
+  systemOverrides = {
+    help = "['']"; # Disable GNOME Help entirely to free up F1
+  };
 }

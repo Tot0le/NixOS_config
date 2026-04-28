@@ -1,3 +1,4 @@
+#/etc/nixos/modules/shortcuts.nix
 { pkgs, ... }:
 
 let
@@ -19,6 +20,13 @@ let
     $DCONF write "${pathBase}/${name}/command" "'${builtins.elemAt data 1}'"
     $DCONF write "${pathBase}/${name}/binding" "'${builtins.elemAt data 2}'"
   '') allShortcuts;
+
+  
+  # Generate commands for system-wide overrides
+  generateOverrides = pkgs.lib.mapAttrsToList (key: value: ''
+    $DCONF write "/org/gnome/settings-daemon/plugins/media-keys/${key}" "${value}"
+  '') (shortcutData.systemOverrides or {});
+  
 in
 {
   # Enable dconf for settings management
@@ -34,7 +42,10 @@ in
       RemainAfterExit = true;
       ExecStart = "${pkgs.writeShellScript "init-shortcuts" ''
         DCONF="${pkgs.dconf}/bin/dconf"
-        
+
+        # Apply system-wide shortcut overrides
+        ${builtins.concatStringsSep "\n" generateOverrides}
+
         # Register the list of active custom bindings
         $DCONF write ${pathBase} "[${builtins.concatStringsSep ", " bindingPaths}]"
 
