@@ -1,13 +1,25 @@
 # /etc/nixos/conf/shortcuts.list.nix
+
 {
   # Schema: name = [ "Display Name" "Command" "Binding" ];
-  apps = {
-    terminal = [ "Terminal" "kitty" "<Super>c" ];
+
+  # Standard applications for all user profiles
+  commonApps = {
     browser  = [ "Browser" "firefox" "<Super>f" ];
     explorer = [ "Explorer" "nautilus" "<Super>e" ];
+  };
+
+  # Administrative tools restricted to elevated profiles
+  adminApps = {
+    terminal = [ "Terminal" "kitty" "<Super>c" ];
+  };
+
+  # Optional graphic utilities
+  graphicTools = {
     picker   = [ "Picker" "pick_color.sh" "<Super>ugrave" ];
   };
 
+  # Hardware control mapped to function keys
   fans = {
     fanMinus2   = [ "Fan -2%" "fan_control.sh minus 2" "<Super>F1" ];
     fanPlus2    = [ "Fan +2%" "fan_control.sh plus 2" "<Super>F2" ];
@@ -17,9 +29,10 @@
     fanSet80    = [ "Fan 80%" "fan_control.sh set 80" "<Super>F6" ];
     fanSet100   = [ "Fan 100%" "fan_control.sh set 100" "<Super>F7" ];
   };
-
+ 
   # System-wide overrides for existing GNOME shortcuts
   systemOverrides = {
-    help = "['']"; # Disable GNOME Help entirely to free up F1
+    "/org/gnome/settings-daemon/plugins/media-keys/help" = "['']"; # Release F1 key mapping
+    "/org/gnome/desktop/wm/keybindings/switch-group" = "['<Alt>Above_Tab']"; # Override window group switching
   };
 }

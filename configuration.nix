@@ -27,23 +27,28 @@ let
   userList = builtins.attrNames usersConfigs;
 in
 {
-  # Propagate the list to all modules
-  _module.args = { inherit userList; };
+  imports = [ 
+    ./hardware-configuration.nix
+    # Home Manager NixOS module (Declarative fetch matched to system version)
+    (builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz" + "/nixos")
+    # System-level modules (Hardware & Security)
+    ./modules/cooling.nix
+    ./modules/docker.nix
+    ./modules/git_tools.nix
+  ];
 
-  
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      # Include modules
-      ./modules/cooling.nix
-      ./modules/graphics.nix
-      ./modules/shortcuts.nix
-      ./modules/monitoring.nix
-      ./modules/kitty.nix
-      ./modules/git_tools.nix
-      ./modules/shell.nix
-      ./modules/docker.nix
-    ];
+  # Global arguments for modules
+  _module.args = { inherit userList usersConfigs; };
+
+  # Home Manager global configuration
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+  home-manager.users = pkgs.lib.genAttrs userList (name: 
+    let 
+      userPath = ./users/${name}/home.nix;
+    in 
+      if builtins.pathExists userPath then import userPath else import ./users/layouts/simple.nix
+  );
 
   # Bootloader.
   boot.loader.grub.enable = true;
@@ -164,7 +169,7 @@ in
   '';
   
   # Enable dconf to allow custom GNOME settings
-  # programs.dconf.enable = true;
+  programs.dconf.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

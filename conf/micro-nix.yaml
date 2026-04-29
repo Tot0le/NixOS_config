@@ -1,0 +1,43 @@
+# /etc/nixos/conf/micro-nix.yaml
+filetype: nix
+
+detect:
+    match: "\\.nix$"
+
+rules:
+    # Comments
+    - comment:
+        start: "(^|\\s)#"
+        end: "$"
+    - comment:
+        start: "/\\*"
+        end: "\\*/"
+
+    # Keywords
+    - statement: "\\b(if|then|else|with|let|in|inherit|rec|import|assert|or)\\b"
+    - constant.bool: "\\b(true|false)\\b"
+    - constant: "\\bnull\\b"
+
+    # Strings
+    - constant.string:
+        start: "\""
+        end: "\""
+        skip: "\\\\."
+        rules:
+            - constant.specialChar: "\\\\."
+            - preproc: "\\$\\{[^}]+\\}"
+
+    # Multi-line strings
+    - constant.string:
+        start: "''"
+        end: "''"
+        rules:
+            - constant.specialChar: "'''|''\\\\."
+            - preproc: "\\$\\{[^}]+\\}"
+
+    # Operators
+    - symbol.operator: "[=+/*<>!?&|@:-]+"
+    - symbol: "[.,;]"
+
+    # Brackets and parenthesis
+    - symbol.brackets: "[()\\[\\]{}]"
