@@ -19,8 +19,8 @@ let
   # NOTE: After first rebuild, you must manually set passwords:
   # sudo passwd <username>
   usersConfigs = {
-    anatole = { fullName = "Anatole"; isAdmin = true; };
-    user   = { fullName = "Random User";   isAdmin = false; };
+    anatole = { fullName = "Anatole"; isAdmin = true; layout = "all-Feature"; };
+    user   = { fullName = "Random User";   isAdmin = false; layout = "simple"; };
   };
   
   # Extract names for module propagation
@@ -33,6 +33,7 @@ in
     (builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz" + "/nixos")
     # System-level modules (Hardware & Security)
     ./modules/cooling.nix
+    ./modules/monitoring.nix
     ./modules/docker.nix
     ./modules/git_tools.nix
   ];
@@ -43,12 +44,15 @@ in
   # Home Manager global configuration
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.users = pkgs.lib.genAttrs userList (name: 
+  
+  home-manager.users = pkgs.lib.mapAttrs (name: info:
     let 
-      userPath = ./users/${name}/home.nix;
+      customProfile = ./users/${name}/home.nix;
     in 
-      if builtins.pathExists userPath then import userPath else import ./users/layouts/simple.nix
-  );
+      if builtins.pathExists customProfile 
+      then import customProfile 
+      else import ./users/layouts/${info.layout}.nix
+  ) usersConfigs;
 
   # Bootloader.
   boot.loader.grub.enable = true;

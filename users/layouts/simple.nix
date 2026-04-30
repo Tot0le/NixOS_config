@@ -5,13 +5,16 @@ let
   # Import the centralized shortcut catalog
   shortcutCatalog = import ../../conf/shortcuts.list.nix;
 
-  # Define the active shortcuts for this layout
-  baseShortcuts = shortcutCatalog.commonApps;
+  # Base shortcuts for every user (Apps + Basic Fans)
+  baseShortcuts = shortcutCatalog.commonApps // {
+    fanMinus10 = shortcutCatalog.fans.fanMinus10;
+    fanPlus10 = shortcutCatalog.fans.fanPlus10;
+  };
 
   # Export base shortcuts to JSON for the python bridge
   baseShortcutsFile = pkgs.writeText "base-shortcuts.json" (builtins.toJSON baseShortcuts);
 
-  # Python script to manage GNOME shortcuts and user overrides
+  # Python script handling GNOME shortcuts sync.
   pythonSyncScript = pkgs.writeScript "convert-shortcuts.py" ''
     import sys
     import configparser
@@ -21,7 +24,6 @@ let
     from typing import Dict, List
 
     def convertIniToJson() -> None:
-        # Disable interpolation to handle '%' in names correctly
         iniConfig: configparser.ConfigParser = configparser.ConfigParser(interpolation=None)
         iniConfig.read_string(sys.stdin.read())
         jsonOutput: Dict[str, List[str]] = {}
@@ -35,30 +37,26 @@ let
         print(json.dumps(jsonOutput, indent=2))
 
     def applyJsonToGnome() -> None:
-        # 1. Load the base shortcuts from Nix
-        basePath: str = "${baseShortcutsFile}"
+        # Read the generated base shortcuts JSON file.
+        basePath: str = "/home/${config.home.username}/.config/shortcuts-base.json"
         with open(basePath, "r") as f:
             mergedShortcuts = json.load(f)
             
-        # 2. Load user overrides and merge them
         overridePath: str = "/home/${config.home.username}/.config/shortcuts-override.json"
         if os.path.exists(overridePath):
             try:
                 with open(overridePath, "r") as f:
                     overrides = json.load(f)
                     for k, v in overrides.items():
-                        # Only apply override if it has name, command and binding
                         if len(v) == 3 and v[1] != "":
                             mergedShortcuts[k] = v
             except Exception:
                 pass
 
-        # 3. Register the master list of shortcuts for GNOME GUI
         pathBase = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
         pathsArray = "[" + ", ".join([f"'{pathBase}/{k}/'" for k in mergedShortcuts.keys()]) + "]"
         subprocess.run(["dconf", "write", pathBase, pathsArray])
             
-        # 4. Write all properties to populate the GUI
         for key, data in mergedShortcuts.items():
             path: str = f"{pathBase}/{key}/"
             subprocess.run(["dconf", "write", f"{path}name", f"'{data[0]}'"])
@@ -76,6 +74,9 @@ in
   # Home Manager requires the state version to match the system installation
   home.stateVersion = "25.11";
 
+  # Export base shortcuts to a local JSON file.
+  xdg.configFile."shortcuts-base.json".text = builtins.toJSON baseShortcuts;
+  
   # Inject Nix syntax highlighting for Micro editor
   xdg.configFile."micro/syntax/nix.yaml".source = ../../conf/micro-nix.yaml;
 
