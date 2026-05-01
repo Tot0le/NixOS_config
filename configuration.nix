@@ -21,7 +21,6 @@ let
   usersConfigs = {
     anatole = { fullName = "Anatole"; isAdmin = true; layout = "all-Feature"; };
     user   = { fullName = "Random User";   isAdmin = false; layout = "simple"; };
-    testuser   = { fullName = "Random User2";   isAdmin = false; layout = "simple"; };       
   };
   
   # Extract names for module propagation
@@ -184,6 +183,21 @@ EOF
     libnotify
 
   ];
+
+  # Automate Home Manager installation on initial terminal session.
+  environment.interactiveShellInit = ''
+    if [ -f "$HOME/.config/home-manager/home.nix" ] && ! command -v home-manager &> /dev/null && [ -z "$HM_IS_INSTALLING" ]
+    then
+        export HM_IS_INSTALLING=1
+        echo "🚀 Initializing personal workspace environment..."
+        nix-channel --add https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz home-manager
+        nix-channel --update
+        nix-shell '<home-manager>' -A install
+        echo ""
+        echo "✅ Workspace ready. Tools and shortcuts deployed."
+        echo "🔄 Please close and reopen this terminal to activate Zsh."
+    fi
+  '';
 
   # Force micro to use system clipboard (wl-clipboard)
   environment.etc."micro/settings.json".text = ''
