@@ -22,13 +22,11 @@ rules:
         start: "\""
         end: "\""
         skip: "\\\\."
-        rules: []
 
     # Chaînes de caractères multi-lignes
     - constant.string:
         start: "''"
         end: "''"
-        rules: []
 
     # Opérateurs et symboles (syntaxe simplifiée)
     - symbol: "[=+/*<>!?&|@:-]+"

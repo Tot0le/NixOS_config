@@ -32,6 +32,8 @@ let
     if [ -n "$output" ]
     then
         echo "$output"
+    else
+        echo "Fan: Auto"
     fi
   '';
 in

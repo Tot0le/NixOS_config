@@ -21,6 +21,7 @@ let
   usersConfigs = {
     anatole = { fullName = "Anatole"; isAdmin = true; layout = "all-Feature"; };
     user   = { fullName = "Random User";   isAdmin = false; layout = "simple"; };
+    testuser   = { fullName = "Random User2";   isAdmin = false; layout = "simple"; };       
   };
   
   # Extract names for module propagation
@@ -29,8 +30,7 @@ in
 {
   imports = [ 
     ./hardware-configuration.nix
-    # Home Manager NixOS module (Declarative fetch matched to system version)
-    (builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz" + "/nixos")
+
     # System-level modules (Hardware & Security)
     ./modules/cooling.nix
     ./modules/monitoring.nix
@@ -40,19 +40,6 @@ in
 
   # Global arguments for modules
   _module.args = { inherit userList usersConfigs; };
-
-  # Home Manager global configuration
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  
-  home-manager.users = pkgs.lib.mapAttrs (name: info:
-    let 
-      customProfile = ./users/${name}/home.nix;
-    in 
-      if builtins.pathExists customProfile 
-      then import customProfile 
-      else import ./users/layouts/${info.layout}.nix
-  ) usersConfigs;
 
   # Bootloader.
   boot.loader.grub.enable = true;
@@ -135,6 +122,39 @@ in
       ++ (if info.isAdmin then [ "wheel" ] else []);
   }) usersConfigs;
 
+
+  # Generate standalone Home Manager templates for new users.
+  system.activationScripts.setupUserHomes = ''
+    ${builtins.concatStringsSep "\n" (pkgs.lib.mapAttrsToList (userName: userInfo: ''
+      declare userHome="/home/${userName}"
+      declare hmConfigDir="$userHome/.config/home-manager"
+      declare hmConfigFile="$hmConfigDir/home.nix"
+
+      if [ ! -f "$hmConfigFile" ]
+      then
+          ${pkgs.coreutils}/bin/mkdir -p "$hmConfigDir"
+          
+          # Copy layout and convert relative paths to absolute NixOS paths.
+          ${pkgs.gnused}/bin/sed -e 's|\.\./\.\.|/etc/nixos|g' \
+              -e 's|\./simple\.nix|/etc/nixos/users/layouts/simple.nix|g' \
+              "/etc/nixos/users/layouts/${userInfo.layout}.nix" > "$hmConfigFile"
+          
+          # Remove final brace to append user-specific parameters.
+          ${pkgs.gnused}/bin/sed -i '$ d' "$hmConfigFile"
+          
+          # Inject Home Manager identity and close configuration block.
+          ${pkgs.coreutils}/bin/cat >> "$hmConfigFile" <<EOF
+  home.username = "${userName}";
+  home.homeDirectory = "$userHome";
+  programs.home-manager.enable = true;
+}
+EOF
+          
+          # Assign ownership to target user.
+          ${pkgs.coreutils}/bin/chown -R ${userName}:users "$userHome/.config"
+      fi
+    '') usersConfigs)}
+  '';
   
   # Install firefox.
   programs.firefox.enable = true;

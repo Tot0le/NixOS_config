@@ -29,5 +29,19 @@ in
     pickColorScript
   ];
 
+  # Enable and configure Zsh
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    
+    oh-my-zsh = {
+      enable = true;
+      theme = "robbyrussell";
+      plugins = [ "git" ];
+    };
+  };
+
   xdg.configFile."kitty/kitty.conf".source = ../../conf/kitty.conf;
 }
