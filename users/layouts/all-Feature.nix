@@ -11,6 +11,9 @@ let
 
   # Environment setup scripts
   setupDb = pkgs.writeShellScriptBin "setup-db" (builtins.readFile ../../scripts/setup_db.sh);
+  setupJava = pkgs.writeShellScriptBin "setup-java" (builtins.readFile ../../scripts/setup_java.sh);
+  setupMinecraft = pkgs.writeShellScriptBin "setup-minecraft" (builtins.readFile ../../scripts/setup_minecraft.sh);
+
 in
 {
   # Inherit base configuration from simple.nix.
@@ -27,11 +30,19 @@ in
   home.packages = [
     pkgs.kitty
 
+    # Java Development Base
+    pkgs.jdk21
+    pkgs.eclipses.eclipse-java
+    pkgs.scenebuilder
+
     # Environment Setups
     setupDb
-
+    setupJava
+    setupMinecraft
+    
     # Add private token script.
     copyGitToken
+
     # Direct import of pick_color script bypassing global modules.
     pickColorScript
   ];
