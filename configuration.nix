@@ -2,14 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-# TODO FIRST : un fichier config pour tout les shortcuts, et config l'utilisateur
 # TODO : eclipse : plantUML, sonarQube, JUnit
-# TODO : quand maintiens VER MAJ + fleche gauche, droite, bas, haut, ça fait respectivement, debut de ligne, fin de ligne, page bas, page haut
 # TODO : rajout obsidian, vscodium, vscode, btop, pinta, oracle virtualbox pour windows, 
 # TODO : gérer les fichiers pour serveur minecraft
-# TODO : gérer les versions de java, pour coder + javafx, et très récent pour serveur minecraft
 # TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
-# TODO : gérer droit utilisateur au niveau de la création, pas anatole
 
 # /etc/nixos/configuration.nix
 { config, pkgs, ... }:

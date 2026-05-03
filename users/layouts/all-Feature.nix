@@ -35,6 +35,11 @@ in
     pkgs.eclipses.eclipse-java
     pkgs.scenebuilder
 
+    # Java plugins
+    pkgs.plantuml
+    pkgs.graphviz
+    pkgs.sonar-scanner-cli
+
     # Environment Setups
     setupDb
     setupJava

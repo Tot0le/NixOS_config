@@ -40,7 +40,7 @@ pkgs.mkShell {
     echo "🚀 IMPORTANT: To ensure Eclipse inherits this environment (Fixes libGL errors):"
     echo "   Type: eclipse &"
     echo ""
-    echo "👉 To create a new standard JavaFX project (Replace 'projectName'):"
+    echo "👉 To create a new project with JUnit 5 & JavaFX:"
     echo "mvn archetype:generate \\"
     echo "    -DarchetypeGroupId=org.openjfx \\"
     echo "    -DarchetypeArtifactId=javafx-archetype-simple \\"
@@ -50,7 +50,12 @@ pkgs.mkShell {
     echo "    -Dversion=1.0 \\"
     echo "    -DinteractiveMode=false"
     echo ""
-    echo "👉 To run the project (ensure you are inside the project folder):"
-    echo "mvn javafx:run"
+    echo "💡 JUnit Tip: Add the following dependency to your pom.xml for testing:"
+    echo "   <dependency>"
+    echo "       <groupId>org.junit.jupiter</groupId>"
+    echo "       <artifactId>junit-jupiter</artifactId>"
+    echo "       <version>5.10.0</version>"
+    echo "       <scope>test</scope>"
+    echo "   </dependency>"
   '';
 }
