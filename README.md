@@ -7,82 +7,51 @@
 
 ## 📖 Overview
 
-This configuration is built with a focus on **modular isolation**. Unlike traditional monolithic setups, every major feature (Graphics, Docker, Shell, Cooling, etc.) is contained within its own module. This allows for a system that is both easy to maintain and simple to **tailor** based on your hardware or workflow needs.
+This configuration is built with a dual focus on **modular isolation** and **Standalone Workspace Architecture**. While core system features (Hardware, Docker, Cooling) are contained within independent NixOS modules, user environments (dotfiles, terminal, tools) are fully isolated and provisioned automatically using **Home Manager**.
 
 **Key Technical Pillars:**
-* ⚙️ **Full Modularity:** Every system component is an independent module. If you don't need a feature, you can disable it by simply removing one line.
-* 🖥️ **Gnome & Wayland:** Optimized for a smooth and modern graphical experience.
-* 🛠️ **Pro Developer Tooling:** Integrated Zsh environment with custom productivity scripts and automated database kits.
-* 🌡️ **Integrated Hardware Control:** Custom fan control scripts (NBFC) and system monitoring tools directly tied to Gnome shortcuts.
+* ⚙️ **System Modularity:** Every system component is an independent module. If you don't need a feature, you can disable it by simply removing one line. This ensures your system remains lightweight and contains only the tools you actually use.
+* 📦 **Zero-Touch Provisioning:** When a new user opens their terminal for the first time, their personal `home.nix` workspace is automatically compiled and activated.
+* 🛠️ **Pro Developer Tooling:** Isolated Zsh environments, Kitty terminal, automated PostgreSQL database kits, and safe custom shortcut bindings.
+* 🌡️ **Integrated Hardware Control:** Custom fan control scripts (NBFC) tied to GNOME shortcuts and top-bar monitoring.
 
 ---
 
-## 🏗️ Modular Architecture
+## 🏗️ Architecture
 
-The heart of this setup lies in its modularity. The `configuration.nix` file acts as a central hub that imports specific functionalities from the `./modules/` directory.
+The `configuration.nix` acts as the central hub. It defines system-level imports and declares the user profiles.
 
-**To disable a module:**
-If you don't need a specific feature (for example, Docker or the Fan Control system), simply open `configuration.nix` and comment out or remove the corresponding line in the `imports` block:
-
-```nix
-  imports = [
-    ./hardware-configuration.nix
-    ./modules/cooling.nix      # Remove this line to disable fan control entirely
-    ./modules/graphics.nix
-    # ...
-  ];
-```
-
-This ensures your system remains lightweight and contains only the tools you actually use.
+When a user is created, an **Activation Script** assigns them a layout (e.g., `all-Feature` or `simple`) and generates a standalone `home-manager` template in their personal directory, which they can then edit freely.
 
 ---
 
 ## ⚙️ Installation & Setup
 
 ### 1. 📥 Get the Configuration
-First, clone your repository into a temporary folder or your home directory:
 
 ```bash
-git clone https://github.com/Tot0le/NixOS_config.git ~/nixos-config
-cd ~/nixos-config
+sudo git clone https://github.com/Tot0le/NixOS_config.git /etc/nixos
+cd /etc/nixos
 ```
 
-### 2. 📂 Backup & Deploy
-Before applying the new setup, backup your current configuration and copy the new files to the system directory:
-
-```bash
-# Backup existing configuration
-sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.bak
-
-# Deploy new configuration
-sudo cp -r . /etc/nixos/
-cd /etc/nixos/
-```
-
-### 3. 👤 User Personalization
-The users are now managed centrally in `configuration.nix`. To add or modify users, update the `usersConfigs` attribute set at the top of the file:
+### 2. 👤 Provisioning Users
+To add or modify users, update the `usersConfigs` attribute set at the top of `configuration.nix`:
 
 ```nix
   usersConfigs = {
-    yourname = { fullName = "Your Name"; isAdmin = true; };
+    yourname = { fullName = "Your Name"; isAdmin = true; layout = "all-Feature"; };
   };
 ```
 
-### 4. 🔒 Secrets & Tokens
-Sensitive data is isolated in a separate file. Create it from the template:
-
-```bash
-cp secrets.nix.template secrets.nix
-micro secrets.nix
-```
-*Note: `secrets.nix` is automatically ignored by Git to prevent data leaks.*
-
-### 5. 🔨 Build the System
-Apply the configuration with:
+### 3. 🔨 Build the System
+Apply the global configuration:
 
 ```bash
 sudo nixos-rebuild switch
 ```
+
+### 4. 🚀 Auto-Initialization
+Log in to your new user account and open the terminal. The system will detect your uninitialized workspace, automatically install Home Manager, apply your specific layout, and prompt you to restart your shell to enjoy Zsh.
 
 ---
 
@@ -97,9 +66,11 @@ This configuration includes a template for an isolated PostgreSQL development en
 4. Start the server with `pg_ctl start -l logfile`. VSCodium is pre-configured with the "Database Client" extension to connect.
 5. Exit the shell with <kbd>Ctrl</kbd> + <kbd>D</kbd>; a `trap` will automatically shut down the database server.
 
-### 🔑 Git Token Manager
-A secure script is integrated to quickly copy your GitHub token to the system clipboard:
-Run `copyGitToken` in the terminal. The system will prompt for the access code defined in your `secrets.nix`. If successful, the token is copied to the clipboard, and a native notification is sent.
+### 🔑 Local Git Token Manager
+A secure, per-user script to copy your GitHub token to the Wayland clipboard:
+1. Run `copyGitToken`. On the first run, it will interactively prompt you to store your token and create a local access PIN.
+2. Credentials are automatically locked down (`chmod 600`) in `~/.config/`.
+3. Subsequent runs will only require your PIN to copy the token and trigger a GNOME notification.
 
 ---
 
@@ -113,6 +84,7 @@ Shortcuts are fully configurable and initialized automatically upon login via `m
 | **Firefox Browser** | <kbd>Super</kbd> + <kbd>F</kbd> |
 | **Nautilus Explorer** | <kbd>Super</kbd> + <kbd>E</kbd> |
 | **Color Picker** | <kbd>Super</kbd> + <kbd>ù</kbd> |
+| **Fan Control** | <kbd>Super</kbd> + <kbd>F1-F7</kbd> |
 
 ### 📊 Hardware Monitoring
 Integrated fan control via <kbd>Super</kbd> + <kbd>F1-F7</kbd> and real-time status updates in the Gnome Top Bar using custom Argos scripts.
