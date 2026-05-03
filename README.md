@@ -29,10 +29,19 @@ When a user is created, an **Activation Script** assigns them a layout (e.g., `a
 
 ### 1. 📥 Get the Configuration
 
-```bash
-sudo git clone https://github.com/Tot0le/NixOS_config.git /etc/nixos
-cd /etc/nixos
-```
+1. **Backup your hardware profile** (vital for your specific machine):
+   ```bash
+   sudo cp /etc/nixos/hardware-configuration.nix /tmp/
+   ```
+2. **Clone the repository** (this will empty the directory first):
+   ```bash
+   sudo rm -rf /etc/nixos/*
+   sudo git clone https://github.com/Tot0le/NixOS_config.git /etc/nixos
+   ```
+3. **Restore your hardware profile**:
+   ```bash
+   sudo cp /tmp/hardware-configuration.nix /etc/nixos/
+   ```
 
 ### 2. 👤 Provisioning Users
 To add or modify users, update the `usersConfigs` attribute set at the top of `configuration.nix`:
