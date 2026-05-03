@@ -34,7 +34,6 @@ in
     ./modules/cooling.nix
     ./modules/monitoring.nix
     ./modules/docker.nix
-    ./modules/git_tools.nix
   ];
 
   # Global arguments for modules
