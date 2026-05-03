@@ -8,6 +8,9 @@ let
   # Package pure bash scripts into executables dynamically
   pickColorScript = pkgs.writeShellScriptBin "pick_color.sh" (builtins.readFile ../../scripts/pick_color.sh);
   copyGitToken = pkgs.writeShellScriptBin "copyGitToken" (builtins.readFile ../../scripts/copy_git_token.sh);
+
+  # Environment setup scripts
+  setupDb = pkgs.writeShellScriptBin "setup-db" (builtins.readFile ../../scripts/setup_db.sh);
 in
 {
   # Inherit base configuration from simple.nix.
@@ -23,6 +26,10 @@ in
 
   home.packages = [
     pkgs.kitty
+
+    # Environment Setups
+    setupDb
+
     # Add private token script.
     copyGitToken
     # Direct import of pick_color script bypassing global modules.
