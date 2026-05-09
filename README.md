@@ -1,11 +1,30 @@
 <div align="center">
-  <h1>❄️ NixOS Personal Configuration</h1>
+  <img src="https://raw.githubusercontent.com/NixOS/nixos-artwork/master/logo/nixos.svg" alt="NixOS Logo" width="250"/>
+  <br/><br/>
+  <h1>NixOS Personal Configuration</h1>
   <p><i>A declarative, highly modular, and reproducible NixOS environment tailored for development and daily productivity.</i></p>
+
+  <p>
+    <img src="https://img.shields.io/badge/NixOS-25.11-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white" alt="NixOS Version" />
+    <img src="https://img.shields.io/badge/Home_Manager-Enabled-FF7A00.svg?style=for-the-badge&logo=NixOS&logoColor=white" alt="Home Manager" />
+    <img src="https://img.shields.io/badge/Shell-Zsh-181717.svg?style=for-the-badge&logo=gnu-bash&logoColor=white" alt="Zsh" />
+    <img src="https://img.shields.io/badge/Containers-Docker-2496ED.svg?style=for-the-badge&logo=Docker&logoColor=white" alt="Docker" />
+  </p>
 </div>
 
 ---
 
-## 📖 Overview
+## 📑 Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Installation & Setup](#installation)
+- [Development Tools](#tools)
+- [Custom Workflow & Shortcuts](#shortcuts)
+
+---
+
+## <a id="overview"></a>📖 Overview
 
 This configuration is built with a dual focus on **modular isolation** and **Standalone Workspace Architecture**. While core system features (Hardware, Docker, Cooling) are contained within independent NixOS modules, user environments (dotfiles, terminal, tools) are fully isolated and provisioned automatically using **Home Manager**.
 
@@ -17,15 +36,20 @@ This configuration is built with a dual focus on **modular isolation** and **Sta
 
 ---
 
-## 🏗️ Architecture
+## <a id="architecture"></a>🏗️ Architecture
 
 The `configuration.nix` acts as the central hub. It defines system-level imports and declares the user profiles.
+
+* **`/modules/`**: System-wide capabilities (Docker, VirtualBox, Cooling, Monitoring).
+* **`/templates/`**: Project-specific `nix-shell` environments (Java, Minecraft, PostgreSQL).
+* **`/users/layouts/`**: Base profile definitions (e.g., `all-Feature` or `simple`).
+* **`/users/features/`**: Granular, plug-and-play user app modules (e.g., `kathara.nix`).
 
 When a user is created, an **Activation Script** assigns them a layout (e.g., `all-Feature` or `simple`) and generates a standalone `home-manager` template in their personal directory, which they can then edit freely.
 
 ---
 
-## ⚙️ Installation & Setup
+## <a id="installation"></a>⚙️ Installation & Setup
 
 ### 1. 📥 Get the Configuration
 
@@ -64,12 +88,21 @@ Apply the global configuration:
 sudo nixos-rebuild switch
 ```
 
-### 4. 🚀 Auto-Initialization
-Log in to your new user account and open the terminal. The system will detect your uninitialized workspace, automatically install Home Manager, apply your specific layout, and prompt you to restart your shell to enjoy Zsh.
+### 4. 🚀 Auto-Initialization & Permissions
+1. **Fix Git Permissions**: Because the repo was cloned using sudo, you must claim ownership of the configuration folder so your local Zsh/Git prompts can read it properly:
+
+```bash
+sudo chown -R $USER:users /etc/nixos
+```
+
+2. **Initialize Workspace**: Open your terminal. The system will detect your uninitialized workspace, automatically install Home Manager, apply your layout, and prompt you to restart your shell to enjoy Zsh.
 
 ---
 
-## 🧰 Development Tools
+## <a id="tools"></a>🧰 Development Tools
+
+### 🌐 Network Emulation (kathará)
+A fully configured network emulation environment utilizing Docker. It is modularized within features/kathara.nix and natively defaults to xterm to ensure robust rendering of virtual device consoles without Wayland/OpenGL conflicts.
 
 ### 🐘 PostgreSQL Kit (`postgres-kit`)
 This configuration includes a template for an isolated PostgreSQL development environment. It allows you to run a local database server within your project folder without affecting the global system.
@@ -80,6 +113,9 @@ This configuration includes a template for an isolated PostgreSQL development en
 4. Start the server with `pg_ctl start -l logfile`. VSCodium is pre-configured with the "Database Client" extension to connect.
 5. Exit the shell with <kbd>Ctrl</kbd> + <kbd>D</kbd>; a `trap` will automatically shut down the database server.
 
+### ☕ Java & Minecraft Kits
+Use `setup-java` (JDK 21, JavaFX, Maven) or `setup-minecraft` (JDK 25, Playit.gg) to instantly deploy isolated project environments with proper library pathing for graphical interfaces.
+
 ### 🔑 Local Git Token Manager
 A secure, per-user script to copy your GitHub token to the Wayland clipboard:
 1. Run `copyGitToken`. On the first run, it will interactively prompt you to store your token and create a local access PIN.
@@ -88,7 +124,7 @@ A secure, per-user script to copy your GitHub token to the Wayland clipboard:
 
 ---
 
-## ⌨️ Custom Workflow & Shortcuts
+## <a id="shortcuts"></a>⌨️ Custom Workflow & Shortcuts
 
 Shortcuts are fully configurable and initialized automatically upon login via `modules/shortcuts.nix`.
 
