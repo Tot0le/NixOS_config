@@ -4,7 +4,6 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 # TODO : steam, gérer compatibilité traduction programme windows en linux (epic games), feather client (minecraft)
-# TODO : rajout obsidian, vscode, btop, pinta, oracle virtualbox pour windows, 
 # TODO : gérer les fichiers pour serveur minecraft
 # TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
 
@@ -15,6 +14,7 @@ let
   # Define all system users and their respective roles
   # NOTE: After first rebuild, you must manually set passwords:
   # sudo passwd <username>
+  # IMPORTANT: Run 'sudo chown -R <admin>:users /etc/nixos' to fix shell permissions (e.g., Git status).
   usersConfigs = {
     anatole = { fullName = "Anatole"; isAdmin = true; layout = "all-Feature"; };
     user   = { fullName = "Random User";   isAdmin = false; layout = "simple"; };

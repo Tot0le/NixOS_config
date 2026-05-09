@@ -78,5 +78,6 @@ in
     };
   };
 
+  # Note: Ensure /etc/nixos is owned by the user (sudo chown -R $USER:users /etc/nixos) for Git status.
   xdg.configFile."kitty/kitty.conf".source = ../../conf/kitty.conf;
 }
