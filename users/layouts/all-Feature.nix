@@ -31,8 +31,17 @@ in
   ));
 
   home.packages = [
+    # Kitty terminal
     pkgs.kitty
 
+    # Text editor
+    pkgs.vscode
+    pkgs.sublime4
+
+    # Productivity apps
+    pkgs.obsidian
+    pkgs.pinta
+    
     # Java Development Base
     pkgs.jdk21
     pkgs.eclipses.eclipse-java

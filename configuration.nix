@@ -1,8 +1,8 @@
+
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-# TODO : emulation kathara install (via import)
 # TODO : steam, gérer compatibilité traduction programme windows en linux (epic games), feather client (minecraft)
 # TODO : rajout obsidian, vscode, btop, pinta, oracle virtualbox pour windows, 
 # TODO : gérer les fichiers pour serveur minecraft
@@ -31,6 +31,7 @@ in
     ./modules/cooling.nix
     ./modules/monitoring.nix
     ./modules/docker.nix
+    #./modules/virtualization.nix
   ];
 
   # Global arguments for modules
@@ -166,12 +167,10 @@ EOF
     gnome-text-editor
     pkgs.git
     pkgs.micro
+    pkgs.btop
     
     # Programmation Languages
     python3
-
-    # Database
-    postgresql
 
     # Some dependencies
     nbfc-linux
