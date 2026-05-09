@@ -75,6 +75,7 @@ in
 
     # Network emulation tool
     kathara
+    pkgs.xterm
     
     # Environment Setups
     setupDb
@@ -103,4 +104,21 @@ in
   };
 
   xdg.configFile."kitty/kitty.conf".source = ../../conf/kitty.conf;
+
+  # Initialize Kathara config with xterm (prevent OpenGL/EGL isolation crashes) only if it does not exist (allows manual user overrides)
+  home.activation.initKathara = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "$HOME/.config/kathara.conf" ]; then
+      $DRY_RUN_CMD mkdir -p "$HOME/.config"
+      $DRY_RUN_CMD echo '{"terminal": "${pkgs.xterm}/bin/xterm"}' > "$HOME/.config/kathara.conf"
+    fi
+  '';
+
+  # Force xterm to use modern fonts and readable colors
+  xresources.properties = {
+    "XTerm*renderFont" = true;
+    "XTerm*faceName" = "Monospace";
+    "XTerm*faceSize" = 11;
+    "XTerm*background" = "black";
+    "XTerm*foreground" = "white";
+  };
 }
