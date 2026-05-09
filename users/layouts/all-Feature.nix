@@ -9,6 +9,39 @@ let
   pickColorScript = pkgs.writeShellScriptBin "pick_color.sh" (builtins.readFile ../../scripts/pick_color.sh);
   copyGitToken = pkgs.writeShellScriptBin "copyGitToken" (builtins.readFile ../../scripts/copy_git_token.sh);
 
+  # Kathara package
+    kathara = pkgs.python3Packages.buildPythonApplication rec {
+    pname = "kathara";
+    version = "3.8.3";
+    format = "setuptools";
+    
+    src = pkgs.python3Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "84a2d3f8ea326cc1128e0a82f13019ed98d18155f8967824e72dc92e295eef84";
+    };
+    
+    doCheck = false;
+    
+    propagatedBuildInputs = with pkgs.python3Packages; [
+      docker
+      packaging
+      requests
+      pyyaml
+      python-dateutil
+      rich
+      binaryornot
+      fs
+      kubernetes
+    ];
+
+    # Expose main script to bin directory to trigger native Nix wrapper
+    postInstall = ''
+      mkdir -p $out/bin
+      cp $out/lib/python${pkgs.python3.pythonVersion}/site-packages/kathara.py $out/bin/kathara
+      chmod +x $out/bin/kathara
+    '';
+  };
+
   # Environment setup scripts
   setupDb = pkgs.writeShellScriptBin "setup-db" (builtins.readFile ../../scripts/setup_db.sh);
   setupJava = pkgs.writeShellScriptBin "setup-java" (builtins.readFile ../../scripts/setup_java.sh);
@@ -40,6 +73,9 @@ in
     pkgs.graphviz
     pkgs.sonar-scanner-cli
 
+    # Network emulation tool
+    kathara
+    
     # Environment Setups
     setupDb
     setupJava

@@ -2,8 +2,9 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-# TODO : eclipse : plantUML, sonarQube, JUnit
-# TODO : rajout obsidian, vscodium, vscode, btop, pinta, oracle virtualbox pour windows, 
+# TODO : emulation kathara install (via import)
+# TODO : steam, gérer compatibilité traduction programme windows en linux (epic games), feather client (minecraft)
+# TODO : rajout obsidian, vscode, btop, pinta, oracle virtualbox pour windows, 
 # TODO : gérer les fichiers pour serveur minecraft
 # TODO : gérer tout les autres fichiers personnels pour transférer les fichiers entre les deux OS
 
