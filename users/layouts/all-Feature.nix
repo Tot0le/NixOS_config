@@ -30,13 +30,15 @@ in
     shortcutCatalog.fans
   ));
 
+  # Allow unfree packages specifically for Home Manager sessions
+  nixpkgs.config.allowUnfree = true;
+  
   home.packages = [
     # Kitty terminal
     pkgs.kitty
 
     # Text editor
     pkgs.vscode
-    pkgs.sublime4
 
     # Productivity apps
     pkgs.obsidian
