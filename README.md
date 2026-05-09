@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/NixOS/nixos-artwork/master/logo/nixos.svg" alt="NixOS Logo" width="250"/>
-  <br/><br/>
+  <img src="https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-colours.svg" alt="NixOS Logo" width="150"/>
+
   <h1>NixOS Personal Configuration</h1>
   <p><i>A declarative, highly modular, and reproducible NixOS environment tailored for development and daily productivity.</i></p>
 
