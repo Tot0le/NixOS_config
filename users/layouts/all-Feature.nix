@@ -28,6 +28,7 @@ in
   xdg.configFile."shortcuts-base.json".text = lib.mkForce (builtins.toJSON (
     shortcutCatalog.commonApps // 
     shortcutCatalog.adminApps // 
+    shortcutCatalog.terminalTools // # (kitty)
     shortcutCatalog.graphicTools // 
     shortcutCatalog.fans
   ));

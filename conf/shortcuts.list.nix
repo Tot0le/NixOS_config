@@ -9,9 +9,15 @@
     explorer = [ "Explorer" "nautilus" "<Super>e" ];
   };
 
+  # Tools for advanced terminal environments (Kitty, etc.)
+  terminalTools = {
+    terminal = [ "Terminal" "kitty" "<Super>c" ];
+    kittyOpaque = [ "Terminal Opaque" "set_opacity 1.0" "<Ctrl><Shift>o" ];
+    kittyTransp = [ "Terminal Transparent" "set_opacity 0.5" "<Ctrl><Shift>p" ];
+  };
+
   # Administrative tools restricted to elevated profiles
   adminApps = {
-    terminal = [ "Terminal" "kitty" "<Super>c" ];
   };
 
   # Optional graphic utilities
