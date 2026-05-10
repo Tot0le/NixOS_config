@@ -21,6 +21,7 @@ in
     ./simple.nix
     ../../users/features/kathara.nix
     ../../users/features/gnome-custom.nix
+    ../../users/features/kitty-terminal.nix 
   ];
 
   # Force override the JSON file with the comprehensive shortcut list.
@@ -35,17 +36,12 @@ in
   nixpkgs.config.allowUnfree = true;
   
   home.packages = [
-    # Kitty terminal
-    pkgs.kitty
-
     # Text editor
     pkgs.vscode
 
     # Productivity apps
     pkgs.obsidian
     pkgs.pinta
-    
-    pkgs.fastfetch
     
     # Java Development Base
     pkgs.jdk21
@@ -76,21 +72,10 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    # Execute fastfetch with custom Catppuccin configuration
-    initContent = ''
-      fastfetch -c ~/.config/fastfetch/config.jsonc
-    '';
-
     oh-my-zsh = {
       enable = true;
       theme = "robbyrussell";
       plugins = [ "git" ];
     };
   };
-
-  # Note: Ensure /etc/nixos is owned by the user (sudo chown -R $USER:users /etc/nixos) for Git status.
-  xdg.configFile."kitty/kitty.conf".source = ../../conf/kitty.conf;
-  xdg.configFile."kitty/kitty-catppuccin-mocha.conf".source = ../../conf/kitty-catppuccin-mocha.conf;
-  xdg.configFile."fastfetch/cat-logo.txt".source = ../../conf/cat-logo.txt;
-  xdg.configFile."fastfetch/config.jsonc".source = ../../conf/fastfetch.jsonc;
 }
