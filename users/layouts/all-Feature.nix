@@ -73,6 +73,11 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
+    # Ignore git commit commands for autosuggestions to prevent annoying auto-completes
+    initContent = ''
+      declare -x ZSH_AUTOSUGGEST_HISTORY_IGNORE="*git commit*"
+    '';
+    
     oh-my-zsh = {
       enable = true;
       theme = "robbyrussell";
