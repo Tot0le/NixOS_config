@@ -20,6 +20,7 @@ in
   imports = [
     ./simple.nix
     ../../users/features/kathara.nix
+    ../../users/features/gnome-custom.nix
   ];
 
   # Force override the JSON file with the comprehensive shortcut list.
