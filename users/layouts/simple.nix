@@ -78,7 +78,7 @@ in
   xdg.configFile."shortcuts-base.json".text = builtins.toJSON baseShortcuts;
   
   # Inject Nix syntax highlighting for Micro editor
-  xdg.configFile."micro/syntax/nix.yaml".source = ../../conf/micro-nix.yaml;
+  xdg.configFile."micro/syntax/nix.yaml".source = ../../conf/micro/micro-nix.yaml;
 
   # Note: We removed dconf.settings keybindings to let the bridge manage them dynamically
 

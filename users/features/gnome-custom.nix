@@ -4,7 +4,7 @@
 let
   # Path to your custom background image
   # IMPORTANT: Ensure this file exists before running the switch command
-  desktopWallpaper = "${../../conf/wallpaper.jpg}";
+  desktopWallpaper = "${../../conf/theme/wallpaper.jpg}";
 in
 {
   # Install essential GNOME extensions for a modern workflow

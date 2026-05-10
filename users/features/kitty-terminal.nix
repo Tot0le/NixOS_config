@@ -15,10 +15,10 @@
 
   # Deploy configuration files as symbolic links to ~/.config/
   xdg.configFile = {
-    "kitty/kitty.conf".source = ../../conf/kitty.conf;
-    "kitty/kitty-catppuccin-mocha.conf".source = ../../conf/kitty-catppuccin-mocha.conf;
-    "fastfetch/cat-logo.txt".source = ../../conf/cat-logo.txt;
-    "fastfetch/config.jsonc".source = ../../conf/fastfetch.jsonc;
+    "kitty/kitty.conf".source = ../../conf/kitty/kitty.conf;
+    "kitty/kitty-catppuccin-mocha.conf".source = ../../conf/kitty/kitty-catppuccin-mocha.conf;
+    "fastfetch/cat-logo.txt".source = ../../conf/fastfetch/cat-logo.txt;
+    "fastfetch/config.jsonc".source = ../../conf/fastfetch/fastfetch.jsonc;
   };
 
   # Note: Ensure /etc/nixos is owned by the user (sudo chown -R $USER:users /etc/nixos) for proper Git status detection.
