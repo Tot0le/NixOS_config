@@ -45,6 +45,8 @@ in
     pkgs.obsidian
     pkgs.pinta
     
+    pkgs.fastfetch
+    
     # Java Development Base
     pkgs.jdk21
     pkgs.eclipses.eclipse-java
@@ -73,7 +75,12 @@ in
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-    
+
+    # Execute fastfetch with custom Catppuccin configuration
+    initContent = ''
+      fastfetch -c ~/.config/fastfetch/config.jsonc
+    '';
+
     oh-my-zsh = {
       enable = true;
       theme = "robbyrussell";
@@ -83,4 +90,7 @@ in
 
   # Note: Ensure /etc/nixos is owned by the user (sudo chown -R $USER:users /etc/nixos) for Git status.
   xdg.configFile."kitty/kitty.conf".source = ../../conf/kitty.conf;
+  xdg.configFile."kitty/kitty-catppuccin-mocha.conf".source = ../../conf/kitty-catppuccin-mocha.conf;
+  xdg.configFile."fastfetch/cat-logo.txt".source = ../../conf/cat-logo.txt;
+  xdg.configFile."fastfetch/config.jsonc".source = ../../conf/fastfetch.jsonc;
 }
