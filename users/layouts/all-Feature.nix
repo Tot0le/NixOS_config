@@ -36,6 +36,21 @@ in
 
   # Allow unfree packages specifically for Home Manager sessions
   nixpkgs.config.allowUnfree = true;
+
+  # Declarative Git configuration
+  programs.git = {
+    enable = true;
+    settings = {
+      core.editor = "micro";
+    };
+  };
+
+  # Set Micro as the default editor for the shell session
+  home.sessionVariables = {
+    EDITOR = "micro";
+    VISUAL = "micro";
+  };
+
   
   home.packages = [
     # Text editor
