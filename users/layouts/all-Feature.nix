@@ -22,6 +22,7 @@ in
     ../../users/features/kathara.nix
     ../../users/features/gnome-custom.nix
     ../../users/features/kitty-terminal.nix 
+    ../../users/features/zsh-shell.nix
   ];
 
   # Force override the JSON file with the comprehensive shortcut list.
@@ -65,23 +66,5 @@ in
     # Direct import of pick_color script bypassing global modules.
     pickColorScript
   ];
-
-  # Enable and configure Zsh
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-
-    # Ignore git commit commands for autosuggestions to prevent annoying auto-completes
-    initContent = ''
-      declare -x ZSH_AUTOSUGGEST_HISTORY_IGNORE="*git commit*"
-    '';
-    
-    oh-my-zsh = {
-      enable = true;
-      theme = "robbyrussell";
-      plugins = [ "git" ];
-    };
-  };
+  
 }
