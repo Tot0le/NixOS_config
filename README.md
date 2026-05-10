@@ -126,7 +126,7 @@ A secure, per-user script to copy your GitHub token to the Wayland clipboard:
 
 ## <a id="shortcuts"></a>⌨️ Custom Workflow & Shortcuts
 
-Shortcuts are fully configurable and initialized automatically upon login via `modules/shortcuts.nix`.
+Shortcuts are centrally configured in `conf/shortcuts.list.nix` and bridged dynamically to GNOME via a custom Python sync script.
 
 | Feature | Keybinding |
 | :--- | :--- |
