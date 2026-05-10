@@ -48,6 +48,13 @@
       
       # Trap SIGUSR2 to cleanly restart the shell with the new prompt
       TRAPUSR2() {
+          echo ""
+          if [ "$(cat ~/.config/prompt-state 2>/dev/null)" = "starship" ]
+          then
+              echo "Switched to Starship"
+          else
+              echo "Switched to Oh-My-Zsh"
+          fi
           exec zsh
       }
 
