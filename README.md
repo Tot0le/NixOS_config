@@ -97,6 +97,13 @@ sudo chown -R $USER:users /etc/nixos
 
 2. **Initialize Workspace**: Open your terminal. The system will detect your uninitialized workspace, automatically install Home Manager, apply your layout, and prompt you to restart your shell to enjoy Zsh.
 
+### 5. 🔄 Future Updates
+For future modifications to your user-specific configuration (dotfiles, terminal, shortcuts), you don't need root privileges anymore. Simply run:
+
+```bash
+home-manager switch
+```
+
 ---
 
 ## <a id="tools"></a>🧰 Development Tools
