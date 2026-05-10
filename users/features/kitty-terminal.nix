@@ -8,14 +8,16 @@
     pkgs.fastfetch
     # Script to manually switch themes
     (pkgs.writeShellScriptBin "switch_theme" (builtins.readFile ../../scripts/switch_theme.sh))
+    # Script to set and save opacity state
+    (pkgs.writeShellScriptBin "set_opacity" (builtins.readFile ../../scripts/set_opacity.sh))
   ];
 
   # Execute fastfetch with a custom configuration file on Zsh initialization
   programs.zsh.initContent = ''
     fastfetch -c ~/.config/fastfetch/config.jsonc
     
-    # Autocompletion for switch_theme command
-    compdef '_values "flavor" mocha latte frappe macchiato' switch_theme
+    # Autocompletion for switch_theme command (ordered from darkest to lightest)
+    compdef 'compadd -V flavors mocha macchiato frappe latte' switch_theme
   '';
 
   # Deploy configuration files as symbolic links to ~/.config/
@@ -31,6 +33,20 @@
     "fastfetch/cat-logo.txt".source = ../../conf/fastfetch/cat-logo.txt;
     "fastfetch/config.jsonc".source = ../../conf/fastfetch/fastfetch.jsonc;
   };
+
+  # Initialize the dynamic state files to prevent startup errors on first launch
+  home.activation.initKittyState = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "$HOME/.config/kitty/opacity-state.conf" ]
+    then
+      $DRY_RUN_CMD mkdir -p "$HOME/.config/kitty"
+      $DRY_RUN_CMD echo "background_opacity 1.0" > "$HOME/.config/kitty/opacity-state.conf"
+    fi
+    if [ ! -f "$HOME/.config/kitty/theme.conf" ]
+    then
+      $DRY_RUN_CMD ln -sf "$HOME/.config/kitty/themes/catppuccin-mocha.conf" "$HOME/.config/kitty/theme.conf"
+    fi
+  '';
+
 
   # Note: Ensure /etc/nixos is owned by the user (sudo chown -R $USER:users /etc/nixos) for proper Git status detection.
   
