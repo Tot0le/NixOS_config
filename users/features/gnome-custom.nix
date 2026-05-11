@@ -1,5 +1,5 @@
 # /etc/nixos/users/features/gnome-custom.nix
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   # Path to your custom background image
@@ -18,17 +18,9 @@ in
   # Configure global GTK theme and icons
   gtk = {
     enable = true;
-    theme = {
-      name = "Catppuccin-Mocha-Standard-Blue-Dark";
-      package = pkgs.catppuccin-gtk.override {
-        accents = [ "blue" ];
-        size = "standard";
-        variant = "mocha";
-      };
-    };
     iconTheme = {
-      name = "Tela-circle-dark";
-      package = pkgs.tela-circle-icon-theme;
+      name = lib.mkForce "Tela-circle-dark";
+      package = lib.mkForce pkgs.tela-circle-icon-theme;
     };
   };
 

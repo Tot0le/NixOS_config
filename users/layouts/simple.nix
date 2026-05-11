@@ -71,6 +71,9 @@ let
   '';
 in
 {
+  # Let Home Manager manage itself and keep its binary in the user PATH
+  programs.home-manager.enable = true;
+
   # Home Manager requires the state version to match the system installation
   home.stateVersion = "25.11";
 

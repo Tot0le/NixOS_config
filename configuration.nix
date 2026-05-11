@@ -24,6 +24,19 @@ let
   userList = builtins.attrNames usersConfigs;
 in
 {
+  # Enable Nix Flakes architecture
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  
+  # Automate garbage collection to prevent storage exhaustion
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
+  # Enable automatic store optimization via hardlinking
+  nix.settings.auto-optimise-store = true;
+
   imports = [ 
     ./hardware-configuration.nix
 

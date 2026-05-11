@@ -16,6 +16,11 @@ let
 
 in
 {
+  # Global Catppuccin theme configuration
+  catppuccin.enable = true;
+  catppuccin.flavor = "mocha";
+  catppuccin.accent = "blue";
+
   # Inherit base configuration from simple.nix.
   imports = [
     ./simple.nix
