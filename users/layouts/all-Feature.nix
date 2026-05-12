@@ -54,6 +54,8 @@ in
   home.sessionVariables = {
     EDITOR = "micro";
     VISUAL = "micro";
+    GIT_ASKPASS = "";
+    SSH_ASKPASS = "";
   };
 
   
