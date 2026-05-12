@@ -76,6 +76,39 @@ in
       };
     };
 
+    # Auto-generate a comprehensive beginner tutorial in the Pictures folder
+    home.file."Pictures/README-wallpaper.txt".text = ''
+      ================================================
+      🎨 TUTORIAL: HOW TO CHANGE YOUR WALLPAPER
+      ================================================
+    
+      1. OPEN THE TERMINAL (OR CONSOLE):
+         - Press Super + C (Your custom keyboard shortcut).
+         - OR press the 'Windows' key (Super), type 'Console' or 'Terminal', and press Enter.
+    
+      2. OPEN YOUR PERSONAL CONFIGURATION FILE:
+         - In the console, type the following command and press Enter:
+           micro ~/.config/home-manager/home.nix
+    
+      3. MODIFY THE WALLPAPER PATH:
+         - Use the arrow keys to find the line: my.gnome.wallpaper
+         - Change the path inside the quotes to your new image.
+         - NOTE: The path "/home/${config.home.username}/Pictures" is exactly 
+           the 'Pictures' folder you see in your file explorer.
+         - Example: my.gnome.wallpaper = "/home/${config.home.username}/Pictures/my_new_photo.jpg";
+         - To Save: Press Ctrl + S
+         - To Quit: Press Ctrl + Q
+    
+      4. APPLY YOUR CHANGES:
+         - In the console, type this command and press Enter:
+           home-manager switch
+    
+      ⚠️ IMPORTANT: THE GNOME CACHE TRAP ⚠️
+      If you replace your image file but keep the SAME name (e.g., default_wallpaper.jpg),
+      GNOME will not see the change immediately due to memory caching.
+      -> SOLUTION: Log out of your session and log back in, or simply use a different filename!
+    '';
+
     # Prevent basic wallpaper: Copy default wallpaper if the user's target path doesn't exist yet
     home.activation.initWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
       TARGET_WALLPAPER="${config.my.gnome.wallpaper}"
