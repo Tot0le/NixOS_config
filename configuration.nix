@@ -226,6 +226,16 @@ EOF
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # Automate garbage collection to prevent storage exhaustion
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
+  # Optimize storage by hardlinking identical files in the Nix store
+  nix.settings.auto-optimise-store = true;
+  
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
