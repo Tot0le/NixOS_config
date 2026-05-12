@@ -32,6 +32,15 @@ in
 
   # Allow unfree packages specifically for Home Manager sessions
   nixpkgs.config.allowUnfree = true;
+
+  # Set Micro as the default editor for the shell session
+  home.sessionVariables = {
+    EDITOR = "micro";
+    VISUAL = "micro";
+    GIT_ASKPASS = "";
+    SSH_ASKPASS = "";
+  };
+
   
   home.packages = [
     # Kitty terminal
