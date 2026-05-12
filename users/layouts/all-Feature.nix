@@ -27,6 +27,7 @@ in
 
   # User-specific GNOME settings
   my.gnome.desktopIcons = true;
+  my.gnome.taskbar = true;
   my.gnome.wallpaper = "${config.home.homeDirectory}/Pictures/default_wallpaper.jpg";
 
   # Force override the JSON file with the comprehensive shortcut list.

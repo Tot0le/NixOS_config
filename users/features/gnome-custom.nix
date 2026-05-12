@@ -18,6 +18,11 @@ in
       default = false;
       description = "Enable or disable desktop icons (DING).";
     };
+    taskbar = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable a persistent or intellihide taskbar (Dash-to-Dock extension).";
+    };
   };
 
   config = {
@@ -29,6 +34,8 @@ in
       appindicator
     ] ++ lib.optionals config.my.gnome.desktopIcons [
       desktop-icons-ng-ding
+    ] ++ lib.optionals config.my.gnome.taskbar [
+      dash-to-dock
     ];
 
     # Manage global desktop appearance via GTK
@@ -63,15 +70,20 @@ in
       "org/gnome/shell" = {
         disable-user-extensions = false;
         enabled-extensions = [
-          "dash-to-dock@micxgx.gmail.com"
           "blur-my-shell@aunetx"
           "just-perfection-desktop@just-perfection"
           "appindicatorsupport@rgcjonas.gmail.com"
         ] ++ lib.optionals config.my.gnome.desktopIcons [
           "ding@rastersoft.com"
+        ] ++ lib.optionals config.my.gnome.taskbar [
+          "dash-to-dock@micxgx.gmail.com"
+        ];
+        disabled-extensions = lib.optionals (!config.my.gnome.taskbar) [
+          "dash-to-dock@micxgx.gmail.com"
         ];
       };
-      "org/gnome/shell/extensions/dash-to-dock" = {
+      # Conditionally configure the dock only if the extension is enabled
+      "org/gnome/shell/extensions/dash-to-dock" = lib.mkIf config.my.gnome.taskbar {
         intellihide = true;
       };
     };
