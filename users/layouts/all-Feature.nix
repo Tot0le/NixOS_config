@@ -25,6 +25,20 @@ in
     ../../users/features/zsh-shell.nix
   ];
 
+  # User-specific GNOME settings
+  my.gnome.desktopIcons = true;
+  my.gnome.wallpaper = "${config.home.homeDirectory}/Pictures/default_wallpaper.jpg";
+
+  # Copy the default system wallpaper to the user's local directory if missing
+  home.activation.initWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "$HOME/Pictures/default_wallpaper.jpg" ]
+    then
+      $DRY_RUN_CMD mkdir -p "$HOME/Pictures"
+      $DRY_RUN_CMD cp ${../../conf/theme/wallpaper.jpg} "$HOME/Pictures/default_wallpaper.jpg"
+      $DRY_RUN_CMD chmod 644 "$HOME/Pictures/default_wallpaper.jpg"
+    fi
+  '';
+
   # Force override the JSON file with the comprehensive shortcut list.
   xdg.configFile."shortcuts-base.json".text = lib.mkForce (builtins.toJSON (
     shortcutCatalog.commonApps // 
