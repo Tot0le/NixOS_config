@@ -75,5 +75,18 @@ in
         intellihide = true;
       };
     };
+
+    # Prevent basic wallpaper: Copy default wallpaper if the user's target path doesn't exist yet
+    home.activation.initWallpaper = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      TARGET_WALLPAPER="${config.my.gnome.wallpaper}"
+      TARGET_DIR=$(dirname "$TARGET_WALLPAPER")
+      
+      if [ ! -f "$TARGET_WALLPAPER" ]
+      then
+        $DRY_RUN_CMD mkdir -p "$TARGET_DIR"
+        $DRY_RUN_CMD cp ${defaultWallpaper} "$TARGET_WALLPAPER"
+        $DRY_RUN_CMD chmod 644 "$TARGET_WALLPAPER"
+      fi
+    '';
   };
  }
