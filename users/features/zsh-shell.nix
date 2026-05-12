@@ -44,7 +44,7 @@
     syntaxHighlighting.enable = true;
 
     initContent = ''
-      declare -x ZSH_AUTOSUGGEST_HISTORY_IGNORE="*git commit*"
+      declare -x ZSH_AUTOSUGGEST_HISTORY_IGNORE="*git commit*|*git clone*"
       
       # Trap SIGUSR2 to cleanly restart the shell with the new prompt
       TRAPUSR2() {
