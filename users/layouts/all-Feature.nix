@@ -37,6 +37,9 @@ in
     # Kitty terminal
     pkgs.kitty
 
+    # A git tool
+    pkgs.gitkraken
+
     # Text editor
     pkgs.vscode
 
