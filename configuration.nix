@@ -14,7 +14,7 @@ let
   # Define all system users and their respective roles
   # NOTE: After first rebuild, you must manually set passwords:
   # sudo passwd <username>
-  # IMPORTANT: Run 'sudo chown -R <admin>:users /etc/nixos' to fix shell permissions (e.g., Git status).
+  # IMPORTANT: Run 'sudo chown -R <username>:users /etc/nixos' to fix shell permissions (e.g., Git status).
   usersConfigs = {
     anatole = { fullName = "Anatole"; isAdmin = true; layout = "all-Feature"; };
     user   = { fullName = "Random User";   isAdmin = false; layout = "simple"; };
@@ -187,10 +187,17 @@ EOF
         echo "🚀 Initializing personal workspace environment..."
         nix-channel --add https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz home-manager
         nix-channel --update
-        nix-shell '<home-manager>' -A install
-        echo ""
-        echo "✅ Workspace ready. Tools and shortcuts deployed."
-        echo "🔄 Please close and reopen this terminal to activate Zsh."
+        
+        if nix-shell '<home-manager>' -A install
+        then
+            echo ""
+            echo "✅ Workspace ready. Tools and shortcuts deployed."
+            echo "🔄 Please close and reopen this terminal to activate Zsh."
+        else
+            echo ""
+            echo "❌ ERROR: Installation failed!"
+            echo "Please fix the configuration errors above, then open a new terminal to try again."
+        fi
     fi
   '';
 

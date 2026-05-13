@@ -72,9 +72,13 @@ When a user is created, an **Activation Script** assigns them a layout (e.g., `a
    sudo cp /tmp/hardware-configuration.nix /etc/nixos/
    ```
 
-### 2. 👤 Provisioning Users
-To add or modify users, update the `usersConfigs` attribute set at the top of `configuration.nix`:
+### 2. 👤 Provisioning Users (CRITICAL)
 
+**Before building**, you MUST edit the configuration to set your actual username:
+```bash
+sudo nano /etc/nixos/configuration.nix
+```
+Update the `usersConfigs` attribute set at the top with your credentials:
 ```nix
   usersConfigs = {
     yourname = { fullName = "Your Name"; isAdmin = true; layout = "all-Feature"; };
@@ -89,13 +93,12 @@ sudo nixos-rebuild switch
 ```
 
 ### 4. 🚀 Auto-Initialization & Permissions
-1. **Fix Git Permissions**: Because the repo was cloned using sudo, you must claim ownership of the configuration folder so your local Zsh/Git prompts can read it properly:
 
-```bash
-sudo chown -R $USER:users /etc/nixos
-```
-
-2. **Initialize Workspace**: Open your terminal. The system will detect your uninitialized workspace, automatically install Home Manager, apply your layout, and prompt you to restart your shell to enjoy Zsh.
+1. **Fix Git Permissions**: Claim ownership of the configuration folder so your local shell can read it properly without root access. Replace `yourname` with your actual username:
+   ```bash
+   sudo chown -R yourname:users /etc/nixos
+   ```
+2. **Initialize Workspace**: Open a **NEW** terminal window. The system will automatically detect your uninitialized workspace, install Home Manager, and apply your layout. (If an error occurs, the script will warn you and stop, allowing you to fix it and try in a new terminal).
 
 ### 5. 🔄 Future Updates
 For future modifications to your user-specific configuration (dotfiles, terminal, shortcuts), you don't need root privileges anymore. Simply run:
