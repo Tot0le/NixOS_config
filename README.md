@@ -20,6 +20,7 @@
 - [Architecture](#architecture)
 - [Installation & Setup](#installation)
 - [Development Tools](#tools)
+- [Desktop & Theming](#theming)
 - [Custom Workflow & Shortcuts](#shortcuts)
 
 ---
@@ -148,6 +149,31 @@ Shortcuts are centrally configured in `conf/shortcuts.list.nix` and bridged dyna
 
 ### 📊 Hardware Monitoring
 Integrated fan control via <kbd>Super</kbd> + <kbd>F1-F7</kbd> and real-time status updates in the Gnome Top Bar using custom Argos scripts.
+
+---
+
+## <a id="theming"></a>🎨 Desktop & Theming
+
+The environment uses the **Catppuccin** aesthetic across the system, ensuring a consistent and visually pleasing experience.
+
+### 🌗 Dynamic Theme Sync
+GNOME and the Kitty terminal are fully synchronized. Changing the GNOME color scheme (Dark/Light mode) will automatically trigger a background service (`kitty-theme-sync`) to switch Kitty between **Catppuccin Mocha** (Dark) and **Catppuccin Latte** (Light).
+- Manually switch terminal themes with: `switch_theme [mocha|macchiato|frappe|latte]`
+- Toggle terminal opacity with: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd> / <kbd>P</kbd>
+
+### 🖼️ Wallpaper Management
+Your desktop background is managed declaratively. To change it, open your `home.nix` and update the `my.gnome.wallpaper` variable to point to your new image file.
+* **GNOME Cache Warning:** If you replace the image file but keep the *exact same filename* (e.g., `wallpaper.jpg`), GNOME will not update the background immediately due to memory caching. Always use a new filename or log out and back in to force the refresh.
+* *(Note: A detailed quick-start tutorial is automatically generated in your `Pictures` folder upon your first login).*
+
+### 🛠️ Customizing Your Setup
+**Recommendation:** For the best experience, start by assigning yourself the `all-Feature` layout in `configuration.nix`. Once your `home.nix` is generated in your personal directory, simply open it and remove the imports or features you don't need. This is much faster and cleaner than building a layout from scratch!
+
+### 🚑 Troubleshooting Themes
+If your GNOME themes or icons ever get stuck due to manual tweaking in the interface, use these fallback commands to reset them to default before running a system rebuild:
+
+    gsettings reset org.gnome.desktop.interface icon-theme
+    gsettings reset org.gnome.desktop.interface gtk-theme
 
 ---
 <p align="center"><i>Built with ❤️ on NixOS</i></p>
